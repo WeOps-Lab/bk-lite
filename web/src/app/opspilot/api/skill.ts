@@ -16,6 +16,10 @@ import type {
   CreateSkillPayload,
   Skill,
 } from '@/app/opspilot/types/skill';
+import type { RedisInstanceFormValue } from '@/app/opspilot/components/skill/redisToolEditor';
+import type { MysqlInstanceFormValue } from '@/app/opspilot/components/skill/mysqlToolEditor';
+import type { OracleInstanceFormValue } from '@/app/opspilot/components/skill/oracleToolEditor';
+import type { MssqlInstanceFormValue } from '@/app/opspilot/components/skill/mssqlToolEditor';
 
 export const useSkillApi = () => {
   const { get, post, patch, del, put } = useApiClient();
@@ -64,6 +68,22 @@ export const useSkillApi = () => {
     return get('/opspilot/model_provider_mgmt/skill_tools/');
   };
 
+  const testRedisConnection = async (instance: Omit<RedisInstanceFormValue, 'testStatus'>): Promise<void> => {
+    await post('/opspilot/model_provider_mgmt/skill_tools/test_redis_connection/', instance);
+  };
+
+  const testMysqlConnection = async (instance: Omit<MysqlInstanceFormValue, 'testStatus'>): Promise<void> => {
+    await post('/opspilot/model_provider_mgmt/skill_tools/test_mysql_connection/', instance);
+  };
+
+  const testOracleConnection = async (instance: Omit<OracleInstanceFormValue, 'testStatus'>): Promise<void> => {
+    await post('/opspilot/model_provider_mgmt/skill_tools/test_oracle_connection/', instance);
+  };
+
+  const testMssqlConnection = async (instance: Omit<MssqlInstanceFormValue, 'testStatus'>): Promise<void> => {
+    await post('/opspilot/model_provider_mgmt/skill_tools/test_mssql_connection/', instance);
+  };
+
   const fetchSkillTemplates = async (): Promise<SkillTemplate[]> => {
     return get('/opspilot/model_provider_mgmt/llm/get_template_list/');
   };
@@ -88,6 +108,10 @@ export const useSkillApi = () => {
     fetchLlmModels,
     saveSkillDetail,
     fetchSkillTools,
+    testRedisConnection,
+    testMysqlConnection,
+    testOracleConnection,
+    testMssqlConnection,
     fetchSkillTemplates,
     createSkill,
     togglePin,

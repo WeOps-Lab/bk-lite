@@ -3,6 +3,7 @@ import { TableDataItem } from '@/app/monitor/types';
 import { useHardwareConfig } from './objects/hardwareDevice/hardware';
 import { useOracleConfig } from './objects/database/oracle';
 import { useElasticSearchConfig } from './objects/database/elasticSearch';
+import { useInfluxDBConfig } from './objects/database/influxdb';
 import { useMongoDBConfig } from './objects/database/mongoDB';
 import { useMysqlConfig } from './objects/database/mysql';
 import { useRedisConfig } from './objects/database/redis';
@@ -13,6 +14,7 @@ import { useWebLogicConfig } from './objects/middleware/webLogic';
 import { useNginxConfig } from './objects/middleware/nginx';
 import { useApacheConfig } from './objects/middleware/apache';
 import { useConsulConfig } from './objects/middleware/consul';
+import { useEtcdBkpullConfig } from './objects/middleware/etcd';
 import { useClickHouseConfig } from './objects/database/clickHouse';
 import { useTomcatConfig } from './objects/middleware/tomcat';
 import { useMinioBkpullConfig } from './objects/middleware/minio';
@@ -54,7 +56,7 @@ import { useKingBaseConfig } from './objects/database/kingBase';
 const loadEnterpriseConfig = (): (() => Record<string, any>) => {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require('@/app/monitor/enterprise/hooks/integration');
+    const mod = require('@/app/monitor/(enterprise)/hooks/integration');
     return mod.useEnterpriseConfig || (() => ({}));
   } catch {
     return () => ({});
@@ -67,6 +69,7 @@ export const useMonitorConfig = () => {
   const hardwareConfig = useHardwareConfig();
   const oracleConfig = useOracleConfig();
   const elasticSearchConfig = useElasticSearchConfig();
+  const influxDBConfig = useInfluxDBConfig();
   const mongoDBConfig = useMongoDBConfig();
   const mysqlDBConfig = useMysqlConfig();
   const redisConfig = useRedisConfig();
@@ -77,6 +80,7 @@ export const useMonitorConfig = () => {
   const nginxConfig = useNginxConfig();
   const apacheConfig = useApacheConfig();
   const consulConfig = useConsulConfig();
+  const etcdConfig = useEtcdBkpullConfig();
   const clickHouseConfig = useClickHouseConfig();
   const tomcatConfig = useTomcatConfig();
   const minioBkpullConfig = useMinioBkpullConfig();
@@ -121,6 +125,7 @@ export const useMonitorConfig = () => {
       'Hardware Server': hardwareConfig,
       Oracle: oracleConfig,
       ElasticSearch: elasticSearchConfig,
+      InfluxDB: influxDBConfig,
       MongoDB: mongoDBConfig,
       Mysql: mysqlDBConfig,
       Redis: redisConfig,
@@ -131,6 +136,7 @@ export const useMonitorConfig = () => {
       Nginx: nginxConfig,
       Apache: apacheConfig,
       Consul: consulConfig,
+      Etcd: etcdConfig,
       ClickHouse: clickHouseConfig,
       Tomcat: tomcatConfig,
       Minio: minioBkpullConfig,

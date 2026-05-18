@@ -99,6 +99,35 @@ const useIntegrationApi = () => {
     return await post('/log/collect_instances/search/', data, config);
   };
 
+  const getCloudRegionList = async () => {
+    return await get('/log/k8s_collect/cloud_region_list/');
+  };
+
+  const createK8sInstance = async (params: {
+    organizations?: React.Key[];
+    id?: string;
+    name?: string;
+    collect_type_id?: React.Key;
+  } = {}) => {
+    return await post('/log/k8s_collect/create_instance/', params);
+  };
+
+  const getK8sCommand = async (params: {
+    instance_id?: string;
+    cloud_region_id?: React.Key;
+    runtime_profile?: 'standard' | 'docker' | 'custom';
+    host_log_path?: string;
+    docker_container_log_path?: string;
+  } = {}) => {
+    return await post('/log/k8s_collect/generate_install_command/', params);
+  };
+
+  const checkK8sCollectStatus = async (params: {
+    instance_id?: string;
+  } = {}) => {
+    return await post('/log/k8s_collect/check_collect_status/', params);
+  };
+
   const getInstanceChildConfig = async (data: {
     instance_id?: string | number;
     instance_type?: string;
@@ -181,6 +210,10 @@ const useIntegrationApi = () => {
     getLogNodeList,
     batchCreateInstances,
     getInstanceList,
+    getCloudRegionList,
+    createK8sInstance,
+    getK8sCommand,
+    checkK8sCollectStatus,
     getInstanceChildConfig,
     deleteLogInstance,
     updateMonitorInstance,

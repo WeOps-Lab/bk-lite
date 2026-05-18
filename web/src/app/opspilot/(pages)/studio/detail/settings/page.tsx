@@ -19,6 +19,7 @@ import { useStudioApi } from '@/app/opspilot/api/studio';
 import ChatflowSettings from '@/app/opspilot/components/studio/chatflowSettings';
 import { useUnsavedChanges } from '@/app/opspilot/hooks/useUnsavedChanges';
 import { useStudio } from '@/app/opspilot/context/studioContext';
+import { getModelOptionText, renderModelOptionLabel } from '@/app/opspilot/utils/modelOption';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -32,7 +33,7 @@ const StudioSettingsPage: React.FC = () => {
   const { groups } = useGroups();
   const [pageLoading, setPageLoading] = useState(true);
   const [saveLoading, setSaveLoading] = useState(false);
-  const [rasaModels, setRasaModels] = useState<{ id: number; name: string; enabled: boolean }[]>([]);
+  const [rasaModels, setRasaModels] = useState<{ id: number; name: string; enabled: boolean; vendor_name?: string }[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
   const [channels, setChannels] = useState<{ id: number; name: string, enabled: boolean }[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
@@ -577,16 +578,16 @@ const StudioSettingsPage: React.FC = () => {
                 <div className="border rounded-md px-4 pt-6 shadow-sm">
                   <Form form={form} labelCol={{ flex: '0 0 128px' }} wrapperCol={{ flex: '1' }}>
                     <Form.Item
-                      label={t('studio.form.name')}
+                      label={t('common.name')}
                       name="name"
-                      rules={[{ required: true, message: `${t('common.inputMsg')}${t('studio.form.name')}` }]}
+                      rules={[{ required: true, message: `${t('common.inputMsg')}${t('common.name')}` }]}
                     >
                       <Input />
                     </Form.Item>
                     <Form.Item
-                      label={t('studio.form.group')}
+                      label={t('common.organization')}
                       name="group"
-                      rules={[{ required: true, message: `${t('common.inputMsg')}${t('studio.form.group')}` }]}
+                      rules={[{ required: true, message: `${t('common.inputMsg')}${t('common.organization')}` }]}
                     >
                       <Select mode="multiple">
                         {groups.map((group) => (
@@ -605,15 +606,15 @@ const StudioSettingsPage: React.FC = () => {
                     </Form.Item>
                     {botType !== 2 && (
                       <Form.Item
-                        label={t('studio.form.model')}
+                        label={t('common.model')}
                         name="rasa_model"
                         tooltip={t('studio.form.modelTip')}
-                        rules={[{ required: true, message: `${t('common.inputMsg')}${t('studio.form.model')}` }]}
+                        rules={[{ required: true, message: `${t('common.inputMsg')}${t('common.model')}` }]}
                       >
                         <Select>
                           {rasaModels.map((model) => (
-                            <Option key={model.id} value={model.id}>
-                              {model.name}
+                            <Option key={model.id} value={model.id} title={getModelOptionText(model)}>
+                              {renderModelOptionLabel(model)}
                             </Option>
                           ))}
                         </Select>

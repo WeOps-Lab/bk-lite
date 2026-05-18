@@ -48,7 +48,7 @@ const ViewList: React.FC<ViewListProps> = ({
   const router = useRouter();
   const { convertToLocalizedTime } = useLocalizedTime();
   const { getEnumValueUnit } = useUnitTransform();
-  const { getCollectType, getTableDiaplay } = useObjectConfigInfo();
+  const { getTableDiaplay } = useObjectConfigInfo();
   const viewRef = useRef<ModalRef>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -279,10 +279,16 @@ const ViewList: React.FC<ViewListProps> = ({
         });
       }
       setQueryData(queryForm);
-      const _plugins = res[1].map((item: IntegrationItem) => ({
-        label: getCollectType(objName as string, item.name as string),
-        value: item.id
-      }));
+      const _plugins = res[1]
+        .sort((a: IntegrationItem, b: IntegrationItem) => {
+          const order = (item: IntegrationItem) =>
+            item.is_pre ? 0 : !item.is_custom ? 1 : 2;
+          return order(a) - order(b);
+        })
+        .map((item: IntegrationItem) => ({
+          label: item.display_name || item.name || '--',
+          value: item.id
+        }));
       setPlugins(_plugins);
       setMetrics(res[0] || []);
       if (objName) {
@@ -299,8 +305,16 @@ const ViewList: React.FC<ViewListProps> = ({
                 '--',
               dataIndex: item.key,
               key: item.key,
-              sorter: (a: any, b: any) =>
-                a[item.key]?.value - b[item.key]?.value,
+              sorter: (a: any, b: any) => {
+                const va = a[item.key]?.value;
+                const vb = b[item.key]?.value;
+                const na = va == null || va === '';
+                const nb = vb == null || vb === '';
+                if (na && nb) return 0;
+                if (na) return -1;
+                if (nb) return 1;
+                return Number(va) - Number(vb);
+              },
               render: (_: unknown, record: TableDataItem) => {
                 const hasDimensions = target?.dimensions?.length > 0;
                 const size: [number, number] = hasDimensions
@@ -343,8 +357,16 @@ const ViewList: React.FC<ViewListProps> = ({
             }),
             ...(item.type === 'value'
               ? {
-                sorter: (a: any, b: any) =>
-                  a[item.key]?.value - b[item.key]?.value
+                sorter: (a: any, b: any) => {
+                  const va = a[item.key]?.value;
+                  const vb = b[item.key]?.value;
+                  const na = va == null || va === '';
+                  const nb = vb == null || vb === '';
+                  if (na && nb) return 0;
+                  if (na) return -1;
+                  if (nb) return 1;
+                  return Number(va) - Number(vb);
+                }
               }
               : {}),
             render: (_: unknown, record: TableDataItem) => {

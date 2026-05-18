@@ -146,13 +146,15 @@ const Asset = () => {
             </Button>
           </Permission>
           <Permission requiredPermissions={['Edit']}>
-            <Button
-              className="ml-[10px]"
-              type="link"
-              onClick={() => openConfigModal(record)}
-            >
-              {t('log.integration.updateConfigration')}
-            </Button>
+            {record.collect_type__name !== 'kubernetes' && (
+              <Button
+                className="ml-[10px]"
+                type="link"
+                onClick={() => openConfigModal(record)}
+              >
+                {t('log.integration.updateConfigration')}
+              </Button>
+            )}
           </Permission>
           <Button
             className="ml-[10px]"
@@ -469,9 +471,9 @@ const Asset = () => {
         showAllMenu
         defaultSelectedKey="all"
         onNodeSelect={handleObjectChange}
-        style={{ width: 230 }}
+        style={{ width: 236, height: 'calc(100vh - 146px)' }}
       />
-      <div className="w-[calc(100vw-230px)] min-w-[1040px] bg-[var(--color-bg-1)] p-[20px]">
+      <div className="w-[calc(100vw-236px)] min-w-[1040px] bg-[var(--color-bg-1)] p-[20px]">
         <div className="flex justify-between items-center mb-[10px]">
           <Input
             allowClear

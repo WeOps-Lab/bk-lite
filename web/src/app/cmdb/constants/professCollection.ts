@@ -132,6 +132,7 @@ export const SQL_FORM_INITIAL_VALUES = {
   intervalValue: 30,
   enterType: ENTER_TYPE.AUTOMATIC,
   name: '',
+  database: '',
   password: '',
   port: '3306',
   timeout: 10,
@@ -163,6 +164,12 @@ export const HOST_FORM_INITIAL_VALUES = {
   timeout: 10,
   cleanupStrategy: 'no_cleanup',
   cleanupDays: 3,
+};
+
+export const CONFIG_FILE_FORM_INITIAL_VALUES = {
+  ...HOST_FORM_INITIAL_VALUES,
+  intervalValue: 10,
+  configFilePath: '',
 };
 
 export const validateCycleTime = (
@@ -428,4 +435,3 @@ export const NETWORK_DEVICE_OPTIONS = [
     label: '负载均衡',
   },
 ]
-

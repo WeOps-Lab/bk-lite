@@ -78,6 +78,12 @@ export interface SkillListResponse {
   count: number;
 }
 
+export interface SkillParam {
+  key: string;
+  value: string;
+  type: 'text' | 'password';
+}
+
 export interface SkillDetail extends Skill {
   llm_model?: number;
   knowledge_base?: number[];
@@ -87,6 +93,7 @@ export interface SkillDetail extends Skill {
   rag_config?: RagConfig;
   temperature?: number;
   skill_prompt?: string;
+  skill_params?: SkillParam[];
   guide?: string;
   show_think?: boolean;
   enable_suggest?: boolean;
@@ -173,6 +180,7 @@ export interface LlmModel {
   enabled: boolean;
   provider?: string;
   llm_model_type?: string;
+  vendor_name?: string;
 }
 
 export interface SkillDetailPayload {

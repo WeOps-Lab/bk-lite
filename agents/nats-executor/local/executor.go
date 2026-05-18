@@ -4,12 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"context"
-	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"nats-executor/logger"
 	"nats-executor/utils"
+	"nats-executor/utils/downloaderr"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -97,11 +98,18 @@ func handleDownloadToLocalMessage(data []byte, instanceId string, nc downloadCon
 	err := downloadToLocalFile(downloadRequest, nc)
 	if err != nil {
 		message := fmt.Sprintf("Failed to download file: %v", err)
+		code := utils.ErrorCodeDependencyFailure
+		switch {
+		case downloaderr.KindOf(err) == downloaderr.KindTimeout || errors.Is(err, context.DeadlineExceeded):
+			code = utils.ErrorCodeTimeout
+		case downloaderr.KindOf(err) == downloaderr.KindIO:
+			code = utils.ErrorCodeExecutionFailure
+		}
 		resp = ExecuteResponse{
 			Success:    false,
 			Output:     message,
 			InstanceId: instanceId,
-			Code:       utils.ErrorCodeDependencyFailure,
+			Code:       code,
 			Error:      message,
 		}
 	} else {
@@ -328,9 +336,6 @@ commandFinished:
 	duration := time.Since(startTime)
 	output := append(stdoutBuf.Bytes(), stderrBuf.Bytes()...)
 	decodedOutput := decodeExecuteOutput(output, shell)
-	rawSample := hex.EncodeToString(sampleBytes(output, 32))
-	stdoutDecoded, stdoutStrategy := decodeExecuteOutputWithStrategy(stdoutBuf.Bytes(), shell)
-	stderrDecoded, stderrStrategy := decodeExecuteOutputWithStrategy(stderrBuf.Bytes(), shell)
 
 	var exitCode int
 	if exitError, ok := err.(*exec.ExitError); ok {
@@ -375,32 +380,6 @@ commandFinished:
 		if isSCPCommand {
 			logger.Infof("[SCP] Instance: %s, success | %s | duration=%s | output=%dB", instanceId, formatSCPLogContext(logContext), duration.Round(time.Second), len(output))
 		}
-	}
-
-	if runtime.GOOS == "windows" && (shell == ShellTypeBat || shell == ShellTypeCmd) {
-		logger.Infof(
-			"[Local Execute][Windows CMD Encoding] Instance: %s, shell=%s, bytes=%d, utf8_valid=%t, raw_hex_prefix=%s, decoded_prefix=%q",
-			instanceId,
-			shell,
-			len(output),
-			utf8.Valid(output),
-			rawSample,
-			truncateForLog(decodedOutput, 120),
-		)
-		logger.Infof(
-			"[Local Execute][Windows CMD Streams] Instance: %s, stdout_bytes=%d, stdout_utf8_valid=%t, stdout_strategy=%s, stdout_hex_prefix=%s, stdout_prefix=%q, stderr_bytes=%d, stderr_utf8_valid=%t, stderr_strategy=%s, stderr_hex_prefix=%s, stderr_prefix=%q",
-			instanceId,
-			stdoutBuf.Len(),
-			utf8.Valid(stdoutBuf.Bytes()),
-			stdoutStrategy,
-			hex.EncodeToString(sampleBytes(stdoutBuf.Bytes(), 32)),
-			truncateForLog(stdoutDecoded, 120),
-			stderrBuf.Len(),
-			utf8.Valid(stderrBuf.Bytes()),
-			stderrStrategy,
-			hex.EncodeToString(sampleBytes(stderrBuf.Bytes(), 32)),
-			truncateForLog(stderrDecoded, 120),
-		)
 	}
 
 	return response
