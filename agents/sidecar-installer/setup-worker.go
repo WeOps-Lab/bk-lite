@@ -589,6 +589,7 @@ collector_configuration_directory: "%s\\generated"
 tags: ["zone:%s", "group:%s"]
 collector_binaries_accesslist:
   - "%s\\bin\\*"
+  - "%s\\bin\\*\\*"
 `,
 		cfg.ServerURL,
 		cfg.APIToken,
